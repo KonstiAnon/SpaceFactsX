@@ -103,7 +103,7 @@ public class ApiMiner {
                             successRate += (((JSONObject) obj).getBoolean("success")) ? 100 : 0;
                         }
                     }
-                    //To prevent dividing by zero
+                    //To prevent division by zero
                     if (countedElements != 0) {
                         System.out.println("The calculated success rate of all previous launches is: " + Math.floor((successRate / countedElements) * 100) / 100 + "%");
                     } else {
