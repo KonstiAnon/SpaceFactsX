@@ -11,7 +11,7 @@ public record Launch(Date launchDate, String rocketId, boolean success, JSONArra
                      String launchpad, boolean upcoming, JSONArray cores, String id) {
 
     public String toString() {
-        Rocket rocket = null;
+        Rocket rocket;
         try {
             rocket = Rocket.initRocket(rocketId);
         }catch (IOException e){
