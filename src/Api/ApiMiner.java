@@ -157,7 +157,7 @@ public class ApiMiner {
                 }
                 case "2" -> {
 
-                    //The way this function works is, for every crew member there is it looks at the launches and them sums the time the payloads spend in space
+                    //The way this function works is, for every crew member there is it looks at the launches and them sums the time the payloads spent in space
                     //This function assumes that every crew member leaves with the same capsule they reached the space station with
                     System.out.println("------------longest time spent in space------------");
                     JSONArray crew = arrayRequest("/v4/crew");
