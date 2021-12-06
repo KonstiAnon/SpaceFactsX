@@ -35,35 +35,35 @@ public class ApiMiner {
         System.out.println("\t[3]What is the success rate of all launches?");
         System.out.println("\t[4]Tell me about the next launch!");
         System.out.println("\t[0]Back to the main menu");
-        try {
-            scanner = new Scanner(System.in);
-            switch (scanner.nextInt()) {
-                case 1 -> {
-                    try {
-                        System.out.println("Calculating the total cost of all launches....");
-                        //Every launch is counted as it is not specified whether the launch cost applies to all launches or only successful ones
-                        HashMap<String, Integer> idToCost = new HashMap<>();
-                        JSONArray arrayOfLaunches = arrayRequest("/v5/launches");
-                        JSONArray arrayOfRockets = arrayRequest("/v4/rockets");
-                        long sum = 0;
-                        JSONObject object;
-                        for (Object obj : arrayOfRockets) {
-                            idToCost.put(((JSONObject) obj).getString("id"), ((JSONObject) obj).getInt("cost_per_launch"));
-                        }
-                        for (int i = 0; i < arrayOfLaunches.length(); i++) {
-                            object = arrayOfLaunches.getJSONObject(i);
-                            sum += idToCost.get(object.getString("rocket"));
-                        }
-                        System.out.println("The approximate total cost of all launches is: $" + sum);
-                    } catch (IOException e) {
-                        System.out.println("There was an error executing your command. Sorry :(");
+
+        scanner = new Scanner(System.in);
+        switch (scanner.nextLine()) {
+            case "1" -> {
+                try {
+                    System.out.println("Calculating the total cost of all launches....");
+                    //Every launch is counted as it is not specified whether the launch cost applies to all launches or only successful ones
+                    HashMap<String, Integer> idToCost = new HashMap<>();
+                    JSONArray arrayOfLaunches = arrayRequest("/v5/launches");
+                    JSONArray arrayOfRockets = arrayRequest("/v4/rockets");
+                    long sum = 0;
+                    JSONObject object;
+                    for (Object obj : arrayOfRockets) {
+                        idToCost.put(((JSONObject) obj).getString("id"), ((JSONObject) obj).getInt("cost_per_launch"));
                     }
+                    for (int i = 0; i < arrayOfLaunches.length(); i++) {
+                        object = arrayOfLaunches.getJSONObject(i);
+                        sum += idToCost.get(object.getString("rocket"));
+                    }
+                    System.out.println("The approximate total cost of all launches is: $" + sum);
+                } catch (IOException e) {
+                    System.out.println("There was an error executing your command. Sorry :(");
                 }
-                case 2 -> {
-                    System.out.println("Which launch do you wish to find out more about? (Please enter a number)");
-                    JSONArray listOfLaunches;
-                    int flightNr = scanner.nextInt();
-                    try {
+            }
+            case "2" -> {
+                System.out.println("Which launch do you wish to find out more about? (Please enter a number)");
+                JSONArray listOfLaunches;
+                int flightNr = scanner.nextInt();
+                try {
                         /*
                         Since the API only allows for requests using an id I had to retrieve all launches and then get the one wanted
                         The API also contains a small error. Although there only being 147 elements the last one has number 152.
@@ -71,55 +71,53 @@ public class ApiMiner {
                         in the array
                          */
 
-                        listOfLaunches = arrayRequest("/v5/launches");
-                        if (flightNr > listOfLaunches.length() || flightNr <= 0) {
-                            System.out.println("Number not within 1 and " + listOfLaunches.length());
-                            throw new IOException();
-                        }
-                        JSONObject launchObject = listOfLaunches.getJSONObject(flightNr - 1);
-                        Launch launch = Launch.initLaunch(launchObject.getString("id"));
-                        System.out.println(launch);
-                    } catch (IOException | JSONException e) {
-                        System.out.println("There was an error handling your request");
-                        e.printStackTrace();
+                    listOfLaunches = arrayRequest("/v5/launches");
+                    if (flightNr > listOfLaunches.length() || flightNr <= 0) {
+                        System.out.println("Number not within 1 and " + listOfLaunches.length());
+                        throw new IOException();
                     }
+                    JSONObject launchObject = listOfLaunches.getJSONObject(flightNr - 1);
+                    Launch launch = Launch.initLaunch(launchObject.getString("id"));
+                    System.out.println(launch);
+                } catch (IOException | JSONException e) {
+                    System.out.println("There was an error handling your request");
+                    e.printStackTrace();
                 }
-                case 3 -> {
-                    try {
-                        double successRate = 0;
-                        int countedElements = 0;
-                        JSONArray launches = arrayRequest("/v5/launches");
-                        for (Object obj : launches) {
-                            if (!((JSONObject) obj).getBoolean("upcoming")) {
-                                countedElements++;
-                                successRate += (((JSONObject) obj).getBoolean("success")) ? 100 : 0;
-                            }
-                        }
-                        if (countedElements != 0) {
-                            System.out.println("The calculated success rate of all previous launches is: " + Math.floor((successRate / countedElements) * 100) / 100 + "%");
-                        }
-                    } catch (IOException e) {
-                        System.out.println("There was an error executing your request");
-                    }
-                }
-                case 4 -> {
-                    Launch launch;
-                    try {
-                        launch = Launch.initLaunch("next");
-                        System.out.println(launch);
-                    } catch (IOException e) {
-                        System.out.println("Could not get information about the next launch.");
-                    }
-                }
-                case 0 -> {
-                    //Do nothing, automatically returns back
-                }
-                default -> System.out.println("Please enter a number between 0 and 4");
-
             }
-        } catch (InputMismatchException e) {
-            System.out.println("You must enter a number!");
+            case "3" -> {
+                try {
+                    double successRate = 0;
+                    int countedElements = 0;
+                    JSONArray launches = arrayRequest("/v5/launches");
+                    for (Object obj : launches) {
+                        if (!((JSONObject) obj).getBoolean("upcoming")) {
+                            countedElements++;
+                            successRate += (((JSONObject) obj).getBoolean("success")) ? 100 : 0;
+                        }
+                    }
+                    if (countedElements != 0) {
+                        System.out.println("The calculated success rate of all previous launches is: " + Math.floor((successRate / countedElements) * 100) / 100 + "%");
+                    }
+                } catch (IOException e) {
+                    System.out.println("There was an error executing your request");
+                }
+            }
+            case "4" -> {
+                Launch launch;
+                try {
+                    launch = Launch.initLaunch("next");
+                    System.out.println(launch);
+                } catch (IOException e) {
+                    System.out.println("Could not get information about the next launch.");
+                }
+            }
+            case "0" -> {
+                //Do nothing, automatically returns back
+            }
+            default -> System.out.println("Please enter a number between 0 and 4");
+
         }
+
     }
 
     /**
@@ -130,11 +128,10 @@ public class ApiMiner {
         System.out.println("\t[1]Find out which agency most crew members work for");
         System.out.println("\t[2]Find out which crew member spent the most time in space");
         System.out.println("\t[0]Return to main menu");
-        //I am aware that I could use nextString() and then parse it to an int, but I choose not to do so
         try {
             scanner = new Scanner(System.in);
-            switch (scanner.nextInt()) {
-                case 1 -> {
+            switch (scanner.nextLine()) {
+                case "1" -> {
                     JSONArray crew = arrayRequest("/v4/crew");
                     Map<String, Integer> agencies = new HashMap<>();
 
@@ -147,7 +144,7 @@ public class ApiMiner {
                     Map<String, Integer> sorted = CollectionsHelper.sortDescending(agencies);
                     sorted.forEach((s, integer) -> System.out.println(s + " has supplied: " + integer + " crew members."));
                 }
-                case 2 -> {
+                case "2" -> {
 
                     //The way this function works is, for every crew member there is it looks at the launches and them sums the time the payloads spend in space
                     //This function assumes that every crew member leaves with the same capsule they reached the space station with
@@ -180,9 +177,10 @@ public class ApiMiner {
                     });
                     System.out.println("------------longest time spent in space------------");
                 }
+                default -> System.out.println("Please enter a number between 1 and 2");
             }
-        } catch (InputMismatchException | IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            //Ignore
         }
     }
 
