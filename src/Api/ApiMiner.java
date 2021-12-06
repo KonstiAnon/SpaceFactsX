@@ -47,9 +47,12 @@ public class ApiMiner {
                     JSONArray arrayOfRockets = arrayRequest("/v4/rockets");
                     long sum = 0;
                     JSONObject object;
+
+                    //Looping through all rocket-(type)s that have every been used
                     for (Object obj : arrayOfRockets) {
                         idToCost.put(((JSONObject) obj).getString("id"), ((JSONObject) obj).getInt("cost_per_launch"));
                     }
+                    //Adding the cost of a specific rocket to the total
                     for (int i = 0; i < arrayOfLaunches.length(); i++) {
                         object = arrayOfLaunches.getJSONObject(i);
                         sum += idToCost.get(object.getString("rocket"));
@@ -72,10 +75,14 @@ public class ApiMiner {
                          */
 
                     listOfLaunches = arrayRequest("/v5/launches");
+
+                    //Error handling
                     if (flightNr > listOfLaunches.length() || flightNr <= 0) {
                         System.out.println("Number not within 1 and " + listOfLaunches.length());
                         throw new IOException();
                     }
+
+                    //Printing out information about the n-th element in the array
                     JSONObject launchObject = listOfLaunches.getJSONObject(flightNr - 1);
                     Launch launch = Launch.initLaunch(launchObject.getString("id"));
                     System.out.println(launch);
@@ -90,13 +97,17 @@ public class ApiMiner {
                     int countedElements = 0;
                     JSONArray launches = arrayRequest("/v5/launches");
                     for (Object obj : launches) {
+                        //Ignoring future launches
                         if (!((JSONObject) obj).getBoolean("upcoming")) {
                             countedElements++;
                             successRate += (((JSONObject) obj).getBoolean("success")) ? 100 : 0;
                         }
                     }
+                    //To prevent dividing by zero
                     if (countedElements != 0) {
                         System.out.println("The calculated success rate of all previous launches is: " + Math.floor((successRate / countedElements) * 100) / 100 + "%");
+                    } else {
+                        System.out.println("The was an error fetching the data!");
                     }
                 } catch (IOException e) {
                     System.out.println("There was an error executing your request");
@@ -154,6 +165,7 @@ public class ApiMiner {
                     //Getting all launches at once to make it more efficient (and not get banned from the API)
                     JSONArray allLaunches = arrayRequest("/v5/launches");
                     Map<String, Integer> launchToTime = new HashMap<>();
+                    //Preparing a Map which lists the time spent in space for each launch, this helps increase efficiency
                     for (Object obj : allLaunches) {
                         if (((JSONObject) obj).getJSONArray("crew").length() != 0) {
                             JSONObject payload = sendRequest("/v4/payloads/" + ((JSONObject) obj).getJSONArray("payloads").get(0));
@@ -161,7 +173,9 @@ public class ApiMiner {
                         }
                     }
                     for (Object member : crew) {
+                        //Get the launches one crew member partook in
                         JSONArray launches = ((JSONObject) member).getJSONArray("launches");
+                        //Loop though all launches, currently no crew member has more than one launch, I still choose to keep it like this
                         for (Object launch : launches) {
                             long timeInSec = launchToTime.getOrDefault(launch, 0);
                             String name = ((JSONObject) member).getString("name");
