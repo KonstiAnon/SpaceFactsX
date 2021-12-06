@@ -1,7 +1,6 @@
 package Api;
 
 import Api.Modules.Launch;
-import Api.Modules.Rocket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,8 +41,7 @@ public class ApiMiner {
                 case 1 -> {
                     try {
                         System.out.println("Calculating the total cost of all launches....");
-                        //Every launch is counted as it is not specified whether the launch cost applies to all launches or only successfull ones
-                        ArrayList<Rocket> rockets = new ArrayList();
+                        //Every launch is counted as it is not specified whether the launch cost applies to all launches or only successful ones
                         HashMap<String, Integer> idToCost = new HashMap<>();
                         JSONArray arrayOfLaunches = arrayRequest("/v5/launches");
                         JSONArray arrayOfRockets = arrayRequest("/v4/rockets");
@@ -105,7 +103,7 @@ public class ApiMiner {
                     }
                 }
                 case 4 -> {
-                    Launch launch = null;
+                    Launch launch;
                     try {
                         launch = Launch.initLaunch("next");
                         System.out.println(launch);
@@ -116,9 +114,8 @@ public class ApiMiner {
                 case 0 -> {
                     //Do nothing, automatically returns back
                 }
-                default -> {
-                    System.out.println("Please enter a number between 0 and 4");
-                }
+                default -> System.out.println("Please enter a number between 0 and 4");
+
             }
         } catch (InputMismatchException e) {
             System.out.println("You must enter a number!");
