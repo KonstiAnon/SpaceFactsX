@@ -29,19 +29,15 @@ public class Terminal {
 
     private void nextCommand() {
         switch (scan.nextLine()) {
-            case "1" -> {
-                miner.launchFacts();
-            }
-            case "2" -> {
-                miner.astronautFacts();
-            }
+            case "1" -> miner.launchFacts();
+            case "2" -> miner.astronautFacts();
+
             case "0" -> {
                 System.out.println("Thank you for using this tool :)");
                 System.exit(0);
             }
-            default -> {
-                System.out.println("The command you entered was invalid, please choose a number between 1 and 2"); //TODO: Correct number
-            }
+            default -> System.out.println("The command you entered was invalid, please choose a number between 1 and 2");
+
         }
     }
 }
